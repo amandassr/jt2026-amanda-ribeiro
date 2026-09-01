@@ -33,6 +33,56 @@ Snapshot estático do mercado imobiliário de **Itapema (SC)**, com anúncios de
 
 ---
 
+## Estrutura do projeto
+
+| Pasta / arquivo | O que é |
+|---|---|
+| `BRIEF.md` | Planejamento da análise (objetivo, critérios, tratamento dos dados, limitações, etapas) |
+| `scripts/` | Código Python reproduzível (auditoria e limpeza) |
+| `output/audit_report.md` | Relatório de auditoria dos dados brutos (linhas, ausentes, duplicidades, chaves, períodos, cobertura) |
+| `output/clean_log.md` | Log de limpeza: cada tratamento aplicado e quantos registros mudaram |
+| `output/processed/` | Dados limpos gerados pelos scripts (reproduzíveis, não versionados) |
+| `data/` | Dados brutos fornecidos pelo desafio |
+
+## Como executar
+
+Crie um ambiente com Python 3 e instale `pandas`:
+
+```bash
+pip install pandas
+```
+
+Auditoria dos dados brutos:
+
+```bash
+python3 scripts/01_audit.py    # gera output/audit_report.md
+```
+
+Limpeza e organização (geram `output/clean_log.md` e os arquivos em `output/processed/`):
+
+```bash
+python3 scripts/02_clean.py
+```
+
+Os arquivos limpos podem ser recriados a qualquer momento; por isso não são versionados.
+
+## Principais cuidados encontrados na auditoria
+
+- **Preço disponível para ~22% dos anúncios** (999 de 4.441) — concentrados em Meia Praia e Centro,
+  e em apartamentos. Isso restringe e orienta as comparações.
+- **Price_AV tem capturas repetidas** da mesma noite (59.799 linhas) — na limpeza mantém-se **a captura
+  mais recente** por `(listing, date)`, regra cuja robustez foi verificada.
+- **`owner_id` em Hosts não é único** (4.440 linhas para 3.057 donos) — na limpeza fica **uma linha por dono**;
+  isso evita multiplicar linhas nas junções.
+- **VivaReal:** 36 anúncios duplicados e 98 sem bairro (marcados como "Desconhecido", nada excluído em silêncio).
+- **Nomes de bairro divergem** entre as bases (acentos, caixa, variantes) — há um mapa de normalização registrado.
+- **Sem ligação direta entre Airbnb e VivaReal** (não há id comum) — o preço de compra será estimado.
+- **Sem metragem no Airbnb** — não se usa receita por m²; não inventamos área.
+- **Ausência de preço NÃO significa ocupado/receita zero.**
+- **Diária anunciada ≠ receita** (sem ocupação real). A sazonalidade jan→abr ainda é um indício a validar.
+
+> Ainda **não** há ranking nem recomendação final: eles virão nas próximas etapas.
+
 ## Resumo do que você entrega
 
 1. **Este repositório, forkado e público**, com a sua análise, o `README.md` explicando como rodar,
