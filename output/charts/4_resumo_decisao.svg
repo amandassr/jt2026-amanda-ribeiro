@@ -6,7 +6,7 @@
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2026-09-01T03:37:20.292490</dc:date>
+    <dc:date>2026-09-01T03:49:26.894524</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
@@ -40,17 +40,17 @@ Q 37.87776 79.056 37.87776 91.1736
 L 37.87776 601.2144 
 Q 37.87776 613.332 45.176832 613.332 
 z
-" clip-path="url(#pba6f4e67eb)" style="fill: #ffffff; stroke: #dde3ec; stroke-width: 1.2; stroke-linejoin: miter"/>
+" clip-path="url(#p1806f9c069)" style="fill: #ffffff; stroke: #dde3ec; stroke-width: 1.2; stroke-linejoin: miter"/>
    </g>
    <g id="line2d_1">
     <path d="M 51.1488 574.776 
 L 51.1488 112.104 
-" clip-path="url(#pba6f4e67eb)" style="fill: none; stroke: #c9a227; stroke-width: 5; stroke-linecap: square"/>
+" clip-path="url(#p1806f9c069)" style="fill: none; stroke: #c9a227; stroke-width: 5; stroke-linecap: square"/>
    </g>
    <g id="line2d_2">
     <path d="M 61.10208 373.734 
 L 346.42944 373.734 
-" clip-path="url(#pba6f4e67eb)" style="fill: none; stroke: #e4e9f1; stroke-width: 1.2; stroke-linecap: square"/>
+" clip-path="url(#p1806f9c069)" style="fill: none; stroke: #e4e9f1; stroke-width: 1.2; stroke-linecap: square"/>
    </g>
    <g id="text_1">
     <text style="font-weight: 700; font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #c9a227" x="69.39648" y="108.210953" transform="rotate(-0 69.39648 108.210953)">CANDIDATO PRINCIPAL</text>
@@ -75,16 +75,16 @@ L 346.42944 373.734
    </g>
    <g id="text_8">
     <text style="font-size: 13px; font-family: 'DejaVu Sans'; fill: #0e1b33" transform="translate(69.39648 448.463188)">Maior retorno base entre grupos com</text>
-    <text style="font-size: 13px; font-family: 'DejaVu Sans'; fill: #0e1b33" transform="translate(69.39648 464.817797)">amostra razoável (7,9% a.a.). Mercado</text>
-    <text style="font-size: 13px; font-family: 'DejaVu Sans'; fill: #0e1b33" transform="translate(69.39648 479.923187)">de venda profundo (1.037 anúncios).</text>
+    <text style="font-size: 13px; font-family: 'DejaVu Sans'; fill: #0e1b33" transform="translate(69.39648 464.323187)">amostra razoável (7,9% a.a.). Ampla</text>
+    <text style="font-size: 13px; font-family: 'DejaVu Sans'; fill: #0e1b33" transform="translate(69.39648 480.417797)">amostra de anúncios de venda (1.037).</text>
    </g>
    <g id="text_9">
-    <text style="font-weight: 700; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #00143d" x="69.39648" y="504.919822" transform="rotate(-0 69.39648 504.919822)">PRINCIPAL RISCO</text>
+    <text style="font-weight: 700; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #00143d" x="69.39648" y="515.459422" transform="rotate(-0 69.39648 515.459422)">PRINCIPAL RISCO</text>
    </g>
    <g id="text_10">
-    <text style="font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #5a6b85" transform="translate(69.39648 548.746405)">Amostra Airbnb moderada (51); retorno</text>
-    <text style="font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #5a6b85" transform="translate(69.39648 563.377264)">depende de ocupação constante e dos</text>
-    <text style="font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #5a6b85" transform="translate(69.39648 578.520819)">cenários de aluguel.</text>
+    <text style="font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #5a6b85" transform="translate(69.39648 546.066805)">Amostra Airbnb moderada (51); retorno</text>
+    <text style="font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #5a6b85" transform="translate(69.39648 560.697664)">depende de ocupação constante e dos</text>
+    <text style="font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #5a6b85" transform="translate(69.39648 575.841219)">cenários de aluguel.</text>
    </g>
   </g>
   <g id="axes_2">
@@ -99,20 +99,20 @@ Q 413.42976 79.056 413.42976 91.1736
 L 413.42976 601.2144 
 Q 413.42976 613.332 420.728832 613.332 
 z
-" clip-path="url(#pa34e09a21d)" style="fill: #ffffff; stroke: #dde3ec; stroke-width: 1.2; stroke-linejoin: miter"/>
+" clip-path="url(#pb048ba2176)" style="fill: #ffffff; stroke: #dde3ec; stroke-width: 1.2; stroke-linejoin: miter"/>
    </g>
    <g id="line2d_3">
     <path d="M 426.7008 574.776 
 L 426.7008 112.104 
-" clip-path="url(#pa34e09a21d)" style="fill: none; stroke: #17a398; stroke-width: 5; stroke-linecap: square"/>
+" clip-path="url(#pb048ba2176)" style="fill: none; stroke: #17a398; stroke-width: 5; stroke-linecap: square"/>
    </g>
    <g id="line2d_4">
     <path d="M 436.65408 373.734 
 L 721.98144 373.734 
-" clip-path="url(#pa34e09a21d)" style="fill: none; stroke: #e4e9f1; stroke-width: 1.2; stroke-linecap: square"/>
+" clip-path="url(#pb048ba2176)" style="fill: none; stroke: #e4e9f1; stroke-width: 1.2; stroke-linecap: square"/>
    </g>
    <g id="text_11">
-    <text style="font-weight: 700; font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #17a398" x="444.94848" y="110.389469" transform="rotate(-0 444.94848 110.389469)">ALTERNATIVA (MAIS LÍQUIDA)</text>
+    <text style="font-weight: 700; font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #17a398" x="444.94848" y="108.210953" transform="rotate(-0 444.94848 108.210953)">ALTERNATIVA (MAIOR AMOSTRA)</text>
    </g>
    <g id="text_12">
     <text style="font-weight: 700; font-size: 21px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #00143d" x="444.94848" y="161.200594" transform="rotate(-0 444.94848 161.200594)">Meia Praia | 2 quartos</text>
@@ -121,7 +121,7 @@ L 721.98144 373.734
     <text style="font-weight: 700; font-size: 34px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #00143d" x="444.94848" y="248.096031" transform="rotate(-0 444.94848 248.096031)">5.9% a.a.</text>
    </g>
    <g id="text_14">
-    <text style="font-size: 12.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #5a6b85" x="444.94848" y="297.858047" transform="rotate(-0 444.94848 297.858047)">Preço estimado: R$ 1,080 mil</text>
+    <text style="font-size: 12.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #5a6b85" x="444.94848" y="297.858047" transform="rotate(-0 444.94848 297.858047)">Preço estimado: R$ 1,08 mi</text>
    </g>
    <g id="text_15">
     <text style="font-size: 12.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #5a6b85" x="444.94848" y="326.999647" transform="rotate(-0 444.94848 326.999647)">Amostra Airbnb (com preço): 187 imóveis</text>
@@ -133,16 +133,16 @@ L 721.98144 373.734
     <text style="font-weight: 700; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #00143d" x="444.94848" y="398.615422" transform="rotate(-0 444.94848 398.615422)">POR QUE CONSIDERAR</text>
    </g>
    <g id="text_18">
-    <text style="font-size: 13px; font-family: 'DejaVu Sans'; fill: #0e1b33" transform="translate(444.94848 448.723187)">Amostra ampla e líquida (187 Airbnb,</text>
-    <text style="font-size: 13px; font-family: 'DejaVu Sans'; fill: #0e1b33" transform="translate(444.94848 464.063187)">243 venda). Menor surpresa esperada;</text>
-    <text style="font-size: 13px; font-family: 'DejaVu Sans'; fill: #0e1b33" transform="translate(444.94848 479.773891)">base para escalar a operação.</text>
+    <text style="font-size: 13px; font-family: 'DejaVu Sans'; fill: #0e1b33" transform="translate(444.94848 448.463188)">Amostra ampla (187 Airbnb, 243 venda).</text>
+    <text style="font-size: 13px; font-family: 'DejaVu Sans'; fill: #0e1b33" transform="translate(444.94848 464.063187)">Menor surpresa esperada; base para</text>
+    <text style="font-size: 13px; font-family: 'DejaVu Sans'; fill: #0e1b33" transform="translate(444.94848 479.773891)">escalar a operação.</text>
    </g>
    <g id="text_19">
-    <text style="font-weight: 700; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #00143d" x="444.94848" y="504.919822" transform="rotate(-0 444.94848 504.919822)">PRINCIPAL RISCO</text>
+    <text style="font-weight: 700; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #00143d" x="444.94848" y="515.459422" transform="rotate(-0 444.94848 515.459422)">PRINCIPAL RISCO</text>
    </g>
    <g id="text_20">
-    <text style="font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #5a6b85" transform="translate(444.94848 548.270819)">Retorno menor (5,9%) e preço de entrada</text>
-    <text style="font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #5a6b85" transform="translate(444.94848 563.651678)">maior (R$ 1,08 mi).</text>
+    <text style="font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #5a6b85" transform="translate(444.94848 545.591219)">Retorno menor (5,9%) e preço de entrada</text>
+    <text style="font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #5a6b85" transform="translate(444.94848 560.972078)">maior (R$ 1,08 mi).</text>
    </g>
   </g>
   <g id="axes_3">
@@ -157,23 +157,23 @@ Q 788.98176 79.056 788.98176 91.1736
 L 788.98176 601.2144 
 Q 788.98176 613.332 796.280832 613.332 
 z
-" clip-path="url(#pf50aa80628)" style="fill: #ffffff; stroke: #dde3ec; stroke-width: 1.2; stroke-linejoin: miter"/>
+" clip-path="url(#pb7c7f58ab8)" style="fill: #ffffff; stroke: #dde3ec; stroke-width: 1.2; stroke-linejoin: miter"/>
    </g>
    <g id="line2d_5">
     <path d="M 802.2528 574.776 
 L 802.2528 112.104 
-" clip-path="url(#pf50aa80628)" style="fill: none; stroke: #00143d; stroke-width: 5; stroke-linecap: square"/>
+" clip-path="url(#pb7c7f58ab8)" style="fill: none; stroke: #00143d; stroke-width: 5; stroke-linecap: square"/>
    </g>
    <g id="line2d_6">
     <path d="M 812.20608 373.734 
 L 1097.53344 373.734 
-" clip-path="url(#pf50aa80628)" style="fill: none; stroke: #e4e9f1; stroke-width: 1.2; stroke-linecap: square"/>
+" clip-path="url(#pb7c7f58ab8)" style="fill: none; stroke: #e4e9f1; stroke-width: 1.2; stroke-linecap: square"/>
    </g>
    <g id="text_21">
     <text style="font-weight: 700; font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #00143d" x="820.50048" y="108.210953" transform="rotate(-0 820.50048 108.210953)">COMPACTO NO CENTRO (TESE)</text>
    </g>
    <g id="text_22">
-    <text style="font-weight: 700; font-size: 21px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #00143d" x="820.50048" y="161.200594" transform="rotate(-0 820.50048 161.200594)">Centro | 1 quartos</text>
+    <text style="font-weight: 700; font-size: 21px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #00143d" x="820.50048" y="161.200594" transform="rotate(-0 820.50048 161.200594)">Centro | 1 quarto</text>
    </g>
    <g id="text_23">
     <text style="font-weight: 700; font-size: 34px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #00143d" x="820.50048" y="248.096031" transform="rotate(-0 820.50048 248.096031)">7.0% a.a.</text>
@@ -191,18 +191,17 @@ L 1097.53344 373.734
     <text style="font-weight: 700; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #00143d" x="820.50048" y="398.615422" transform="rotate(-0 820.50048 398.615422)">POR QUE CONSIDERAR</text>
    </g>
    <g id="text_28">
-    <text style="font-size: 13px; font-family: 'DejaVu Sans'; fill: #0e1b33" transform="translate(820.50048 448.957797)">Melhor retorno dentro do Centro (6,97%)</text>
-    <text style="font-size: 13px; font-family: 'DejaVu Sans'; fill: #0e1b33" transform="translate(820.50048 464.063187)">e menor preço de entrada. A tese dos</text>
-    <text style="font-size: 13px; font-family: 'DejaVu Sans'; fill: #0e1b33" transform="translate(820.50048 479.773891)">compactos se sustenta no Centro, não</text>
-    <text style="font-size: 13px; font-family: 'DejaVu Sans'; fill: #0e1b33" transform="translate(820.50048 496.522562)">na cidade.</text>
+    <text style="font-size: 13px; font-family: 'DejaVu Sans'; fill: #0e1b33" transform="translate(820.50048 448.957797)">Melhor retorno no Centro (6,97% a.a.) e</text>
+    <text style="font-size: 13px; font-family: 'DejaVu Sans'; fill: #0e1b33" transform="translate(820.50048 464.063187)">menor entrada. A tese dos compactos</text>
+    <text style="font-size: 13px; font-family: 'DejaVu Sans'; fill: #0e1b33" transform="translate(820.50048 480.807797)">se sustenta no Centro.</text>
    </g>
    <g id="text_29">
-    <text style="font-weight: 700; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #00143d" x="820.50048" y="504.919822" transform="rotate(-0 820.50048 504.919822)">PRINCIPAL RISCO</text>
+    <text style="font-weight: 700; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #00143d" x="820.50048" y="515.459422" transform="rotate(-0 820.50048 515.459422)">PRINCIPAL RISCO</text>
    </g>
    <g id="text_30">
-    <text style="font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #5a6b85" transform="translate(820.50048 548.996405)">Poucos anúncios de venda no Centro (22)</text>
-    <text style="font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #5a6b85" transform="translate(820.50048 563.520819)">e concentração da oferta; ocupação é</text>
-    <text style="font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #5a6b85" transform="translate(820.50048 578.377264)">suposição.</text>
+    <text style="font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #5a6b85" transform="translate(820.50048 546.316805)">Poucos anúncios de venda no Centro (22)</text>
+    <text style="font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #5a6b85" transform="translate(820.50048 560.841219)">e concentração da oferta; ocupação é</text>
+    <text style="font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #5a6b85" transform="translate(820.50048 575.697664)">suposição.</text>
    </g>
   </g>
   <g id="axes_4">
@@ -217,7 +216,7 @@ Q 11.9808 620.55072 11.9808 621.71712
 L 11.9808 643.17888 
 Q 11.9808 644.34528 67.2768 644.34528 
 z
-" clip-path="url(#p5d5fcd3da4)" style="fill: #fbf3e0; stroke: #e6cf80; stroke-linejoin: miter"/>
+" clip-path="url(#p2a95c8aa23)" style="fill: #fbf3e0; stroke: #e6cf80; stroke-linejoin: miter"/>
    </g>
    <g id="text_31">
     <text style="font-style: italic; font-weight: 700; font-size: 9.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #8a6d1f" x="576" y="635.106145" transform="rotate(-0 576 635.106145)">Retornos e receitas são estimativas baseadas em cenários de ocupação (conservador / base / otimista) — ver scripts/config.py. Não representam ocupação comprovada do mercado de Itapema.</text>
@@ -231,16 +230,16 @@ z
   </g>
  </g>
  <defs>
-  <clipPath id="pba6f4e67eb">
+  <clipPath id="p1806f9c069">
    <rect x="34.56" y="68.04" width="331.776" height="550.8"/>
   </clipPath>
-  <clipPath id="pa34e09a21d">
+  <clipPath id="pb048ba2176">
    <rect x="410.112" y="68.04" width="331.776" height="550.8"/>
   </clipPath>
-  <clipPath id="pf50aa80628">
+  <clipPath id="pb7c7f58ab8">
    <rect x="785.664" y="68.04" width="331.776" height="550.8"/>
   </clipPath>
-  <clipPath id="p5d5fcd3da4">
+  <clipPath id="p2a95c8aa23">
    <rect x="23.04" y="620.784" width="1105.92" height="23.328"/>
   </clipPath>
  </defs>

@@ -63,7 +63,8 @@ plt.rcParams.update({
 
 def short_name(row):
     b = {"Tabuleiro dos Oliveiras": "Tabuleiro"}.get(row["bairro"], row["bairro"])
-    return f"{b} | {row['quartos']} quartos"
+    q = int(row["quartos"])
+    return f"{b} | {q} quarto{'s' if q != 1 else ''}"
 
 def name_n(row):
     return f"{short_name(row)}  ·  n={int(row['n_airbnb(preço)'])}"
@@ -108,6 +109,32 @@ def validate_fig(fig, label, dpi=180, tol=3):
         print(f"[{label}] OK: nenhum texto cortado (canvas {w}x{h} @ {dpi}dpi).")
     return bad
 
+def validate_collisions(fig, label, tol=3):
+    """Valida sobreposição entre caixas de texto visíveis (pares que se interceptam)."""
+    fig.canvas.draw()
+    ren = fig.canvas.get_renderer()
+    boxes = []
+    for t in fig.texts + [tt for ax in fig.axes if ax.axison for tt in
+                          list(ax.texts) + ax.get_xticklabels() + ax.get_yticklabels()] + \
+             [tt for ax in fig.axes if not ax.axison for tt in ax.texts]:
+        if not t.get_visible() or not t.get_text().strip():
+            continue
+        boxes.append((t.get_text()[:34], t.get_window_extent(renderer=ren).extents))
+    overlaps = []
+    for i in range(len(boxes)):
+        for j in range(i + 1, len(boxes)):
+            a = boxes[i][1]; b = boxes[j][1]
+            if (a[0] < b[2] - tol and a[2] > b[0] + tol and
+                    a[1] < b[3] - tol and a[3] > b[1] + tol):
+                overlaps.append((boxes[i][0], boxes[j][0]))
+    if overlaps:
+        print(f"[{label}] COLISÃO: {len(overlaps)} sobreposição(ões):")
+        for o in overlaps:
+            print("   ", o)
+    else:
+        print(f"[{label}] COLISÃO OK: nenhuma sobreposição de texto.")
+    return overlaps
+
 def clean_ax(ax, xlabel=None, ylabel=None):
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
@@ -118,6 +145,24 @@ def clean_ax(ax, xlabel=None, ylabel=None):
 
 def fmt_real(x, _):
     return f"R$ {x/1e3:,.0f}k" if x < 1e6 else f"R$ {x/1e6:.1f}M"
+
+def fmt_brl_val(v):
+    """Valor em reais, curto para anotação de barra/cartão: 'R$ 790 mil' / 'R$ 1,08 mi'."""
+    if v is None or (isinstance(v, float) and pd.isna(v)):
+        return "—"
+    if v >= 1_000_000:
+        val = f"{v/1_000_000:.2f}".replace(".", ",").rstrip("0").rstrip(",")
+        return f"R$ {val} mi"
+    return f"R$ {v/1_000:.0f} mil"
+
+def fmt_brl_axis(v, pos=None):
+    """Formata o eixo x de preço: 'R$ 400 mil' / 'R$ 1,2 mi'."""
+    v = float(v)
+    if v == 0:
+        return "R$ 0"
+    if v < 1_000_000:
+        return f"R$ {v/1_000:.0f} mil"
+    return f"R$ {v/1_000_000:.1f}".replace(".", ",") + " mi"
 
 # ---------------------------------------------------------------------------
 # Dados
@@ -296,21 +341,23 @@ def ax_inches(ax, fig):
 def fit_block(ax, fig, x_frac, y_top_frac, text, max_w_frac, fontsize0, max_h_frac,
               color=INK, ha="left", weight="normal", style="normal", spacing=1.16,
               min_fs=6.0):
-    """Place text wrapped to width AND height, shrinking font until it fits."""
+    """Place text wrapped to width AND height. Retorna (text_obj, fontsize, n_linhas)."""
     axw, axh = ax_inches(ax, fig)
     max_w_in, max_h_in = max_w_frac * axw, max_h_frac * axh
-    fs = fontsize0
+    fs, chosen_lines = fontsize0, None
     while fs >= min_fs:
         lines = wrap_inches(text, max_w_in, fs)
         if len(lines) * line_h_in(fs, spacing) <= max_h_in:
-            return ax.text(x_frac, y_top_frac, "\n".join(lines),
-                           transform=ax.transAxes, va="top", ha=ha, fontsize=fs,
-                           color=color, fontweight=weight, style=style, linespacing=1.2)
+            chosen_lines = lines
+            break
         fs -= 0.5
-    lines = wrap_inches(text, max_w_in, min_fs)
-    return ax.text(x_frac, y_top_frac, "\n".join(lines), transform=ax.transAxes,
-                   va="top", ha=ha, fontsize=min_fs, color=color,
-                   fontweight=weight, style=style)
+    if chosen_lines is None:
+        chosen_lines = wrap_inches(text, max_w_in, min_fs)
+        fs = min_fs
+    obj = ax.text(x_frac, y_top_frac, "\n".join(chosen_lines),
+                  transform=ax.transAxes, va="top", ha=ha, fontsize=fs,
+                  color=color, fontweight=weight, style=style, linespacing=1.2)
+    return obj, fs, len(chosen_lines)
 
 def rounded_box(ax, x, y, w, h, fc, ec="#DDE3EC", radius=0.02, lw=1.2):
     ax.add_patch(FancyBboxPatch((x, y), w, h,
@@ -324,16 +371,16 @@ def get_focal(name):
 
 p = get_focal("principal"); a = get_focal("alternativa"); c = get_focal("compacto")
 CAND = [("principal", p, GOLD, "CANDIDATO PRINCIPAL"),
-        ("alternativa", a, SEA, "ALTERNATIVA (MAIS LÍQUIDA)"),
+        ("alternativa", a, SEA, "ALTERNATIVA (MAIOR AMOSTRA)"),
         ("compacto", c, NAVY, "COMPACTO NO CENTRO (TESE)")]
 
 CAND_WHY = {
     "principal": "Maior retorno base entre grupos com amostra razoável (7,9% a.a.). "
-                 "Mercado de venda profundo (1.037 anúncios).",
-    "alternativa": "Amostra ampla e líquida (187 Airbnb, 243 venda). Menor surpresa "
-                   "esperada; base para escalar a operação.",
-    "compacto": "Melhor retorno dentro do Centro (6,97%) e menor preço de entrada. "
-                "A tese dos compactos se sustenta no Centro, não na cidade.",
+                 "Ampla amostra de anúncios de venda (1.037).",
+    "alternativa": "Amostra ampla (187 Airbnb, 243 venda). Menor surpresa esperada; "
+                   "base para escalar a operação.",
+    "compacto": "Melhor retorno no Centro (6,97% a.a.) e menor entrada. "
+                "A tese dos compactos se sustenta no Centro.",
 }
 CAND_RISK = {
     "principal": "Amostra Airbnb moderada (51); retorno depende de ocupação constante "
@@ -377,7 +424,7 @@ for (key, r, accent, ttl), x in zip(CAND, CXS):
             fontsize=34, fontweight="bold", color=NAVY, va="top", ha="left")
     # Linhas de informação (preço / amostras)
     info = [
-        f"Preço estimado: R$ {r['preco_compra_est']/1e3:,.0f} mil",
+        f"Preço estimado: {fmt_brl_val(r['preco_compra_est'])}",
         f"Amostra Airbnb (com preço): {int(r['n_airbnb(preço)'])} imóveis",
         f"Amostra VivaReal: {int(r['n_vivareal'])} anúncios",
     ]
@@ -388,14 +435,21 @@ for (key, r, accent, ttl), x in zip(CAND, CXS):
         iy -= 0.052
     # divisor
     ax.plot([0.08, 0.94], [0.445, 0.445], transform=ax.transAxes, color="#E4E9F1", lw=1.2)
-    # Por que considerar
+    # Por que considerar (com altura medida para garantir espaço vertical fixo até o risco)
     ax.text(0.105, 0.415, "POR QUE CONSIDERAR", transform=ax.transAxes, fontsize=11,
             fontweight="bold", color=NAVY, va="top", ha="left")
-    fit_block(ax, fig, 0.105, 0.330, CAND_WHY[key], 0.80, 13.0, 0.155, color=INK)
+    axh_in = ax_inches(ax, fig)[1]
+    why_obj, why_fs, why_n = fit_block(ax, fig, 0.105, 0.330, CAND_WHY[key], 0.80, 13.0,
+                                       0.16, color=INK)
+    h_why_ax = why_n * line_h_in(why_fs, 1.16) / axh_in
+    GAP = 0.045  # espaço vertical fixo entre os blocos (fração do cartão)
+    risk_header_y = 0.330 - h_why_ax - GAP
     # Principal risco
-    ax.text(0.105, 0.222, "PRINCIPAL RISCO", transform=ax.transAxes, fontsize=11,
+    ax.text(0.105, risk_header_y, "PRINCIPAL RISCO", transform=ax.transAxes, fontsize=11,
             fontweight="bold", color=NAVY, va="top", ha="left")
-    fit_block(ax, fig, 0.105, 0.148, CAND_RISK[key], 0.80, 12.5, 0.105, color=MUTE)
+    risk_top = risk_header_y - 0.05
+    risk_avail = max(risk_top - 0.035, 0.03)
+    fit_block(ax, fig, 0.105, risk_top, CAND_RISK[key], 0.80, 12.5, risk_avail, color=MUTE)
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1)
     ax.axis("off")
@@ -407,6 +461,7 @@ note_ax.text(0.5, 0.5, FOOT_NOTE, transform=note_ax.transAxes, ha="center", va="
 note_ax.axis("off")
 
 validate_fig(fig, "4_resumo_decisao", dpi=200)
+validate_collisions(fig, "4_resumo_decisao")
 save(fig, "4_resumo_decisao", dpi=200)
 plt.close(fig)
 
@@ -416,9 +471,9 @@ plt.close(fig)
 fig = plt.figure(figsize=(16, 9))
 fig.patch.set_facecolor(BG)
 
-fig.text(0.05, 0.955, "Comparação dos candidatos — Itapema/SC",
+fig.text(0.05, 0.958, "Comparação dos candidatos — Itapema/SC",
          fontsize=17, fontweight="bold", color=NAVY, va="top")
-fig.text(0.05, 0.907, "Preço de compra estimado (mediana VivaReal) · retorno base (cenário "
+fig.text(0.05, 0.918, "Preço de compra estimado (mediana VivaReal) · retorno base (cenário "
          "médio) · tamanho das amostras.",
          fontsize=11, color=MUTE, va="top")
 
@@ -426,14 +481,7 @@ colors = {"principal": GOLD, "alternativa": SEA, "compacto": NAVY}
 comp_rows = pd.concat([p.to_frame().T, a.to_frame().T, c.to_frame().T])
 comp_rows = comp_rows.reset_index(drop=True)
 
-PANELS = [
-    # (x, n_major, title, xlabel, fmt)
-    (0.05,  "preco_compra_est", "Preço de compra estimado", "R$ (mediana VivaReal)", lambda v: fmt_real(v, None)),
-    (0.365, "retorno_base(%)", "Retorno base", "% ao ano", lambda v: f"{v:.2f}%".replace(".", ",")),
-    (0.68,  "n_airbnb(preço)", "Tamanho da amostra (Airbnb)", "n imóveis com preço", lambda v: f"{int(v)}"),
-]
-
-def panel(ax, n_major, title, xlabel, fmt, show_viva=False):
+def panel(ax, n_major, title, xlabel, fmt, ticks=None, xfmt=None):
     yy = np.arange(len(comp_rows))[::-1]
     for i, (_, r) in enumerate(comp_rows.iterrows()):
         y = yy[i]
@@ -444,43 +492,52 @@ def panel(ax, n_major, title, xlabel, fmt, show_viva=False):
         # nome do candidato ACIMA da barra (horizontal, dentro do painel, sem corte)
         ax.text(0.0, y + 0.42, r["nome"], va="bottom", ha="left",
                 fontsize=11, fontweight="bold", color=MUTE, zorder=4, clip_on=False)
-    # sem rótulos no eixo y (nomes vão acima das barras, evitando corte à esquerda)
     ax.set_yticks([])
+    ax.set_ylim(-0.7, 3.2)
     ax.set_xlabel(xlabel, fontsize=11, color=MUTE)
-    ax.set_title(title, fontsize=14, fontweight="bold", color=NAVY, loc="left", pad=14)
+    ax.set_title(title, fontsize=14, fontweight="bold", color=NAVY, loc="left", pad=16)
     ax.set_axisbelow(True)
     clean_ax(ax)
-    ax.set_xlim(0, comp_rows[n_major].max() * 1.42)
+    if ticks is not None:
+        ax.set_xticks(ticks)
+        span = ticks[-1] - ticks[0]
+        ax.set_xlim(ticks[0] - 0.1 * span, ticks[-1] + 0.1 * span)
+    else:
+        ax.set_xlim(0, comp_rows[n_major].max() * 1.42)
+    if xfmt is not None:
+        ax.xaxis.set_major_formatter(FuncFormatter(xfmt))
     ax.tick_params(axis="x", colors=MUTE)
-    ax.set_yticks([])
 
-# painéis de preço e retorno
-for x, n_major, title, xlabel, fmt in PANELS[:2]:
-    panel(fig.add_axes([x, 0.16, 0.30, 0.70]), n_major, title, xlabel, fmt, show_viva=False)
+# painéis de preço e retorno (com mais espaço no topo)
+PRICE_TICKS = [0, 400_000, 800_000, 1_200_000]
+panel(fig.add_axes([0.05, 0.12, 0.30, 0.74]), "preco_compra_est",
+      "Preço de compra estimado", "R$ (mediana VivaReal)",
+      fmt_brl_val, ticks=PRICE_TICKS, xfmt=fmt_brl_axis)
+panel(fig.add_axes([0.365, 0.12, 0.30, 0.74]), "retorno_base(%)", "Retorno base",
+      "% ao ano (cenário médio)",
+      lambda v: f"{v:.1f}%".replace(".", ","), ticks=[0, 2, 4, 6, 8, 10])
 
-# painel de amostras: também mostra VivaReal
-axs = fig.add_axes([0.68, 0.16, 0.30, 0.70])
+# painel de amostras: sem legenda; rótulos "Airbnb: n" / "VivaReal: n" ao lado das barras
+axs = fig.add_axes([0.68, 0.12, 0.30, 0.74])
 yy = np.arange(len(comp_rows))[::-1]
 for i, (_, r) in enumerate(comp_rows.iterrows()):
     y = yy[i]
-    axs.barh(y + 0.185, r["n_vivareal"], height=0.30, color="#C6CFDB", edgecolor="none",
-             label="VivaReal" if i == 0 else None, zorder=2)
+    axs.barh(y + 0.185, r["n_vivareal"], height=0.30, color="#C6CFDB", edgecolor="none", zorder=2)
     axs.barh(y - 0.185, r["n_airbnb(preço)"], height=0.30, color=colors[r["focal"]],
-             edgecolor="none", label="Airbnb com preço" if i == 0 else None, zorder=3)
-    axs.text(r["n_vivareal"], y + 0.185, f"  {int(r['n_vivareal'])}", va="center", ha="left",
-             fontsize=12.5, color=MUTE, zorder=4, clip_on=False)
-    axs.text(r["n_airbnb(preço)"], y - 0.185, f"  {int(r['n_airbnb(preço)'])}", va="center",
-             ha="left", fontsize=12.5, fontweight="bold", color=INK, zorder=4, clip_on=False)
+             edgecolor="none", zorder=3)
+    axs.text(r["n_vivareal"], y + 0.185, f"   VivaReal: {int(r['n_vivareal'])}", va="center",
+             ha="left", fontsize=12, color=GRAY_D, zorder=4, clip_on=False)
+    axs.text(r["n_airbnb(preço)"], y - 0.185, f"   Airbnb: {int(r['n_airbnb(preço)'])}", va="center",
+             ha="left", fontsize=12, fontweight="bold", color=colors[r["focal"]], zorder=4, clip_on=False)
     axs.text(0.0, y + 0.42, r["nome"], va="bottom", ha="left",
              fontsize=11, fontweight="bold", color=MUTE, zorder=4, clip_on=False)
 axs.set_yticks([])
-axs.set_ylabel("Airbnb (verde/azul/dourado = candidato) · VivaReal (cinza)", fontsize=10, color=MUTE)
+axs.set_ylim(-0.7, 3.2)
 axs.set_xlabel("n imóveis / anúncios", fontsize=11, color=MUTE)
-axs.set_title("Tamanho da amostra", fontsize=14, fontweight="bold", color=NAVY, loc="left", pad=14)
+axs.set_title("Tamanho da amostra", fontsize=14, fontweight="bold", color=NAVY, loc="left", pad=16)
 axs.set_axisbelow(True)
-axs.set_xticks([0, 200, 400, 600, 800, 1000, 1200])
-axs.set_xlim(0, 1200)
-axs.legend(loc="lower right", frameon=False, fontsize=10)
+axs.set_xticks([0, 300, 600, 900, 1200])
+axs.set_xlim(-120, 1600)
 clean_ax(axs)
 axs.tick_params(axis="x", colors=MUTE)
 
@@ -491,6 +548,7 @@ note_ax2.text(0.5, 0.5, FOOT_NOTE, transform=note_ax2.transAxes, ha="center", va
 note_ax2.axis("off")
 
 validate_fig(fig, "5_comparacao_candidatos", dpi=200)
+validate_collisions(fig, "5_comparacao_candidatos")
 save(fig, "5_comparacao_candidatos", dpi=200)
 plt.close(fig)
 
