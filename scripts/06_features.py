@@ -45,9 +45,10 @@ L.append(pd.DataFrame(rows).to_string(index=False) + "\n")
 L.append("\n**Leitura:** valores positivos indicam que imóveis com mais daquela característica "
          "têm, em média, diária/receita maiores (associação). Não implica causalidade.\n")
 
-L.append("\n**Diária mediana por tipo de superhost:**")
+L.append("\n**Diária mediana por tipo de superhost (amostra: imóveis com preço):**")
 sup = m.groupby("is_superhost")["diaria_mediana"].median().round(0)
-L.append(sup.to_string() + "\n")
+sup_n = m.groupby("is_superhost")["diaria_mediana"].size()
+L.append(pd.DataFrame({"n imóveis": sup_n, "diária mediana (R$)": sup}).to_string() + "\n")
 
 L.append("\n**Diária mediana por tipo de imóvel:**")
 L.append(m.groupby("listing_type")["diaria_mediana"].median().round(0).to_string() + "\n")

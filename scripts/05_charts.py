@@ -401,7 +401,7 @@ fig.patch.set_facecolor(BG)
 
 fig.text(0.035, 0.955, "Resumo da decisão — candidatos de investimento em Itapema/SC",
          fontsize=17, fontweight="bold", color=NAVY, va="top")
-fig.text(0.035, 0.918, "Números preliminares, sujeitos à revisão. Percentuais = retorno bruto "
+fig.text(0.035, 0.918, "Estimativas baseadas nos dados e cenários descritos. Percentuais = retorno bruto "
          "estimado (% ao ano), receita estimada ÷ preço de compra estimado.",
          fontsize=11, color=MUTE, va="top")
 
@@ -550,6 +550,41 @@ note_ax2.axis("off")
 validate_fig(fig, "5_comparacao_candidatos", dpi=200)
 validate_collisions(fig, "5_comparacao_candidatos")
 save(fig, "5_comparacao_candidatos", dpi=200)
+plt.close(fig)
+
+# ---------------------------------------------------------------------------
+# VISUAL 6 — Características associadas a diária/receita (correlação Spearman)
+# ---------------------------------------------------------------------------
+CORR = {
+    "Nº de quartos":       (0.582, 0.596),
+    "Nº de banheiros":     (0.536, 0.552),
+    "Nº de hóspedes":      (0.498, 0.515),
+    "Taxa de limpeza":     (0.384, 0.393),
+    "Nº de reviews":       (-0.166, -0.156),
+    "Nota (star_rating)":  (0.059, 0.066),
+}
+fig, ax = plt.subplots(figsize=(16, 9))
+fig.subplots_adjust(left=0.26, right=0.985, top=0.90, bottom=0.14)
+items = list(CORR.items())
+y = np.arange(len(items))
+labels = [k for k, _ in items]
+for i, (k, (d, r)) in enumerate(items):
+    ax.barh(y[i] + 0.19, d, height=0.36, color=NAVY_H, label="Diária" if i == 0 else None)
+    ax.barh(y[i] - 0.19, r, height=0.36, color=SEA, label="Receita (cenário base)" if i == 0 else None)
+    ax.text(d, y[i] + 0.19, f"  {d:+.3f}", va="center", ha="left", fontsize=11, clip_on=False)
+    ax.text(r, y[i] - 0.19, f"  {r:+.3f}", va="center", ha="left", fontsize=11, clip_on=False)
+ax.set_yticks(y, labels)
+ax.set_xticks([-0.2, 0.0, 0.2, 0.4, 0.6])
+ax.set_xlim(-0.25, 0.7)
+ax.axvline(0, color="#C6CFDB", lw=1)
+ax.set_xlabel("Correlação de Spearman (associação; não causa)")
+ax.set_title("Tamanho e capacidade são as características mais associadas a diária e à receita",
+             fontsize=14, fontweight="bold", color=NAVY, loc="left", pad=14)
+ax.legend(loc="lower right", frameon=False, fontsize=11)
+ax.set_axisbelow(True)
+clean_ax(ax)
+validate_fig(fig, "6_caracteristicas")
+save(fig, "6_caracteristicas")
 plt.close(fig)
 
 print("Visuais regenerados (PNG + SVG) em output/charts/:")

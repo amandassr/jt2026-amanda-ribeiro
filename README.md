@@ -19,6 +19,9 @@ que torna o preço estimado mais sólido, e por amostra Airbnb razoável (51 im�
 > (seção 7). Não são valores comprovados nem líquidos — não incluem custos de gestão,
 > manutenção, IPTU, condomínio ou impostos.
 
+![Resumo da decisão — candidatos](output/charts/4_resumo_decisao.png)
+*Figura 1 — Resumo da decisão: cartões dos três candidatos avaliados.*
+
 ## 2. As quatro perguntas do desafio
 
 ### P1 — Qual o melhor perfil de imóvel?
@@ -30,9 +33,15 @@ real investido é o **apartamento de 2 quartos**, com destaque para Morretes.
 
 ### P2 — Qual a melhor localização em termos de receita?
 
-As **diárias mais altas** estão na **Meia Praia** (imóveis maiores e mais caros).
-A **melhor combinação receita ÷ preço de compra** (retorno), porém, aparece em **Morretes**,
-seguido por grupos de Centro e Meia Praia (ver `output/decision_table.csv`).
+Em **receita potencial estimada**, a localização de maior receita é a **Meia Praia**:
+o perfil **apartamento de 4 quartos** tem receita-base estimada de **≈ R$ 137,9 mil/ano**
+(com **60 imóveis com preço** na amostra; diária típica ≈ R$ 1.012).
+
+**Receita ≠ retorno:** receita alta não significa melhor investimento. O **retorno**
+(receita ÷ preço de compra) da Meia Praia 4q é baixo (**≈ 3,8% a.a.**) por causa do
+preço de compra elevado. A melhor combinação **receita ÷ preço de compra** aparece em
+**Morretes** (7,9% a.a.), seguida por grupos de Centro e Meia Praia de 2 quartos
+(ver `output/decision_table.csv`).
 
 ### P3 — Quais características explicam as melhores receitas?
 
@@ -47,8 +56,12 @@ Associação (não causalidade), com diária mediana e receita-base por imóvel:
 | Nº de reviews | −0,17 | −0,16 |
 | Nota (star_rating) | +0,06 | +0,07 |
 
+![Características associadas a diária e receita](output/charts/6_caracteristicas.png)
+*Figura 2 — Correlação (Spearman) entre características e diária/receita. Associação, não causa.*
+
 - **Tamanho (quartos/banheiros/capacidade)** é o fator mais fortemente associado a receita maior.
-- **Superhost** não diferencia a diária, em média (575 vs 518).
+- **Superhost** não diferencia a diária, em média: **R$ 575** para não-superhosts (565 imóveis)
+  vs **R$ 518** para superhosts (434 imóveis), na amostra de imóveis com preço (n=999).
 - `min_nights` não varia na base (n/d) — não há como avaliar.
 - Imóveis com diária no p99 têm estrutura maior e estão em Meia Praia/Centro.
 
@@ -82,6 +95,9 @@ de entrada que as alternativas comparadas.
 | Amostra Airbnb com preço | 51 | 187 | 78 |
 | Amostra VivaReal (anúncios) | 1.037 | 243 | 22 |
 | Confiança da amostra | Média/razoável | Alta | Compra fina |
+
+![Comparação dos candidatos](output/charts/5_comparacao_candidatos.png)
+*Figura 3 — Comparação de preço, retorno e amostra entre os três candidatos.*
 
 **Por que Morretes 3 quartos não foi escolhido (retorno maior, 10,2% a.a.)?**
 A amostra é pequena — **apenas 10 imóveis com preço** — abaixo do mínimo de confiança
@@ -131,19 +147,29 @@ compra estimado (bruto, sem custos).
 
 **Limitações:**
 - Preço disponível só para 22,5%; 77% dos imóveis ficam sem análise de receita.
-- Janela de apenas ~3,5 meses e de pico (jan–abr) → projeção anual sensível à sazonalidade (suposição).
+- Janela de preços **curta** (jan–abr/2025), que **inclui o pico de janeiro e a queda observada
+  até abril** — **não representa o ano completo**; a projeção anual é sensível à sazonalidade (suposição).
 - Sem ocupação real; sem custos (gestão, manutenção, IPTU, condomínio, impostos) → retorno é bruto.
 
 **Para uma compra real, seriam necessários:**
 - Histórico de ocupação/noites reservadas por imóvel;
 - custos operacionais e impostos (IPTU, condomínio, gestão, manutenção);
 - verificação de titularidade/área e visita técnica;
-- tendências de demanda por bairro fora da alta temporada.
+- tendências de demanda por bairro **ao longo do ano**.
 
 ## 8. Como reproduzir
 
+Opção rápida — roda toda a análise na ordem correta:
+
 ```bash
-pip install pandas matplotlib
+pip install -r requirements.txt
+python3 scripts/run_all.py
+```
+
+Ou, passo a passo (mesmas etapas do comando único):
+
+```bash
+pip install -r requirements.txt
 python3 scripts/01_audit.py      # auditoria -> output/audit_report.md
 python3 scripts/02_clean.py      # limpeza -> output/clean_log.md e output/processed/
 python3 scripts/03_revenue.py    # receita por cenário -> output/revenue_report.md
@@ -172,10 +198,31 @@ python3 scripts/05_charts.py     # visuais -> output/charts/*.png e *.svg
 - `3_retorno_3_cenarios` — retorno bruto nos três cenários por grupo.
 - `4_resumo_decisao` — cartões dos 3 candidatos (recomendação, alternativa, tese).
 - `5_comparacao_candidatos` — comparação de preço, retorno e amostra.
+- `6_caracteristicas` — características associadas a diária/receita (correlação).
 
 **Como a IA foi utilizada:** as conversas completas estarão em `ai-log/` (texto) — iteração de
 análise, decisões de metodologia, revisões críticas das escolhas e correções de qualidade dos
 dados, documentados para avaliação do processo.
+
+## 10. Decisões tomadas com apoio da IA
+
+De forma transparente, estas foram as decisões de metodologia nas quais a IA ajudou e que,
+após revisão crítica, foram mantidas:
+
+- **Taxa fixa de ocupação rejeitada e substituída por cenários**: em vez de chutar um
+  percentual único (ex.: 50%), a receita usa três cenários (conservador/base/otimista) com
+  premissas visíveis em `scripts/config.py`.
+- **Ausência de preço mantida como desconhecida**: não foi tratada como "ocupado", "zero"
+  ou "vendido" — imóvel sem preço fica fora da estimativa de receita, sem inferência.
+- **Duplicidade de anfitriões corrigida antes da junção**: `Hosts_ids` tinha 4.440 linhas
+  para 3.057 donos; foi deduplicado por `owner_id` para que a junção não multiplicasse linhas.
+- **Grupos pequenos separados dos candidatos confiáveis**: apenas grupos com n≥10 entram na
+  tabela de decisão; n<30 é marcado como baixa confiança, e a sensibilidade ao corte é
+  reportada (Morretes 3q, por exemplo, só lidera com amostra fina).
+- **Afirmações de sazonalidade e "liquidez" revisadas para não ultrapassar os dados**:
+  a queda jan→abr é tratada como indício sujeito a validação (não como conclusão), e o termo
+  "liquidez" foi evitado porque não há dado de velocidade de venda — usamos apenas tamanho de
+  amostra de anúncios.
 
 ---
 

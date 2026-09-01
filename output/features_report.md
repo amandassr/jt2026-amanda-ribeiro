@@ -15,10 +15,11 @@ number_of_bathrooms             +0.536       +0.552
 **Leitura:** valores positivos indicam que imóveis com mais daquela característica têm, em média, diária/receita maiores (associação). Não implica causalidade.
 
 
-**Diária mediana por tipo de superhost:**
-is_superhost
-False    575.0
-True     518.0
+**Diária mediana por tipo de superhost (amostra: imóveis com preço):**
+              n imóveis  diária mediana (R$)
+is_superhost                                
+False               565                575.0
+True                434                518.0
 
 
 **Diária mediana por tipo de imóvel:**
