@@ -1,53 +1,31 @@
-# Roteiro do vídeo (aprox. 2min40)
+# Roteiro final do vídeo — duração aproximada de 2min40
 
-Recomendação de investimento em Itapema (SC). Quatro blocos, um por pergunta do desafio, mais abertura e encerramento.
+[Mostrar `output/charts/4_resumo_decisao.png`]
 
----
+Olá, eu sou Amanda. Analisei dados do Airbnb e do VivaReal para recomendar onde e em qual imóvel a Seazone deveria investir em Itapema. Minha recomendação é um apartamento de dois quartos em Morretes.
 
-## Bloco 1 — Abertura (0:00–0:15)
+Primeira pergunta: qual o melhor perfil? Quartos, banheiros e capacidade de hóspedes estão associados a diárias maiores. Mas a maior diária não significa o melhor investimento. Ao comparar a receita estimada com o preço de compra, o apartamento de dois quartos apresentou o melhor equilíbrio entre retorno e segurança da amostra.
 
-"A Seazone quer decidir onde e no que investir hoje em Itapema. Usando dados de Airbnb e de venda (VivaReal), eu construí uma recomendação: apartamentos de 2 quartos em Morretes. Neste vídeo, mostro como cheguei lá, respondendo as quatro perguntas do desafio."
+[Mostrar `output/charts/5_comparacao_candidatos.png`]
 
----
+Segunda pergunta: qual a melhor localização em receita? A Meia Praia lidera em receita potencial, principalmente nos imóveis maiores. Um apartamento de quatro quartos chega a aproximadamente 138 mil reais por ano no cenário-base. Porém, como o preço de compra é elevado, o retorno fica em aproximadamente 3,8%. Em retorno sobre o valor investido, Morretes se destaca.
 
-## Bloco 2 — Melhor perfil e melhor localização (P1 e P2) (0:15–1:00)
+[Mostrar `output/charts/6_caracteristicas.png`]
 
-"Primeiro, o perfil. Imóveis maiores — mais quartos, mais banheiros, mais hóspedes — têm diárias e receitas maiores. Isso é uma associação observada nos dados, não uma causa. Comparando o que gera retorno para o dinheiro investido, o apartamento de 2 quartos aparece como o perfil eficiente entre os grupos com amostra confiável."
+Na terceira pergunta, as características mais associadas às maiores receitas foram quantidade de quartos, banheiros e hóspedes. Nota, reviews e superhost não mostraram vantagem consistente de preço. Essas relações são associações, não provas de causa.
 
-"Segundo, a localização. As diárias mais altas da cidade estão na Meia Praia, nos imóveis maiores. Mas receita alta não basta: o que importa é a receita dividida pelo preço de compra. Aí Morretes se destaca: melhor retorno entre os grupos com amostra sólida."
+[Voltar para `output/charts/4_resumo_decisao.png`]
 
----
+Quarta pergunta: o que eu compraria hoje? Um apartamento de dois quartos em Morretes. O preço estimado é de 790 mil reais e a receita anual no cenário-base é de aproximadamente 62,7 mil reais. Isso representa retorno bruto estimado de 7,9% ao ano, variando entre 5,6% no cenário conservador e 10,7% no otimista. A análise reúne 51 imóveis com preço no Airbnb e 1.037 anúncios de venda no VivaReal.
 
-## Bloco 3 — Características associadas a melhores receitas (P3) (1:00–1:45)
+Morretes com três quartos apresentou retorno maior, mas tinha apenas dez imóveis com preço. Preferi não transformar uma amostra pequena em uma recomendação firme.
 
-"Terceiro, o que explica as melhores receitas. O que mais pesa são tamanho e capacidade: quartos, banheiros e hóspedes têm correlação forte e positiva com a receita. Taxa de limpeza mais alta também anda junto com diária maior. Já a nota e o selo de superhost quase não mudam o preço médio; e reviews têm relação levemente negativa — imóveis novos, com poucos reviews, costumam cobrar caro."
+A tese dos compactos de um quarto no Centro também não venceu. É o melhor perfil dentro do Centro, com retorno estimado de 7%, mas fica atrás de Morretes na comparação da cidade e possui somente 22 referências de venda.
 
-"Entre os três candidatos finais: Morretes de dois quartos lidera com retorno de quase oito por cento ao ano, preço estimado de setecentos e noventa mil reais, apoiado em mais de mil anúncios de venda. Meia Praia de dois quartos tem amostra maior, mas retorno menor. E o compacto no Centro, de um quarto, é o melhor do seu bairro, mas fica atrás na comparação da cidade."
+[Mostrar o repositório público no GitHub, suas pastas e `ai-log/opencode-session.md`]
 
----
+Usei a IA durante todo o processo, mas revisei suas sugestões. Rejeitei uma taxa fixa de ocupação, mantive preços ausentes como desconhecidos, corrigi duplicidades e separei resultados exploratórios dos mais confiáveis. Todo o processo está registrado no ai-log.
 
-## Bloco 4 — O que eu compraria e por quê (P4) (1:45–2:25)
+[Voltar para `output/charts/4_resumo_decisao.png`]
 
-"Quarta pergunta: o que eu compraria hoje? Compraria apartamentos de dois quartos em Morretes, com retorno bruto estimado de sete vírgula nove por cento ao ano no cenário base — cinco vírgula seis no conservador e dez vírgula sete no otimista. Receita estimada de sessenta e dois mil reais por ano, sobre um preço de compra estimado de setecentos e noventa mil. Esses números vêm de mil e trinta e sete anúncios de venda e de cinquenta e um imóveis com preço no Airbnb."
-
-"Por que não o de três quartos em Morretes, que tem retorno ainda maior? Porque se apoia em apenas dez imóveis com preço: é uma aposta com pouco dado. E por que a tese dos compactos no Centro não vence? Porque, na cidade, ela tem retorno menor e amostra de compra fina — apenas vinte e dois anúncios. Ela funciona para o bairro, não para a cidade."
-
----
-
-## Bloco 5 — Encerramento (2:25–2:40)
-
-"Deixei claro que retorno e receita são estimativas por cenários de ocupação — não são valores comprovados nem líquidos. Com mais uma semana, eu buscaria dados de ocupação real e custos operacionais para transformar esse retorno bruto em uma projeção líquida."
-
----
-
-## Cronometragem
-
-| Bloco | Tema | Tempo |
-|------|------|-------|
-| 1 | Abertura / recomendação | 0:00–0:15 |
-| 2 | Perfil + localização (P1 e P2) | 0:15–1:00 |
-| 3 | Características associadas (P3) | 1:00–1:45 |
-| 4 | Decisão e por quê (P4) | 1:45–2:25 |
-| 5 | Encerramento + o que faria com mais tempo | 2:25–2:40 |
-
-Tempo total: ~2m40s.
+Receita e retorno são estimativas baseadas em cenários, não valores comprovados ou líquidos. Antes de uma compra real, eu buscaria dados de ocupação e custos operacionais. Com os dados disponíveis, Morretes com dois quartos é a decisão mais defensável.
