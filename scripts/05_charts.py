@@ -68,12 +68,45 @@ def short_name(row):
 def name_n(row):
     return f"{short_name(row)}  ·  n={int(row['n_airbnb(preço)'])}"
 
-def save(fig, base, tight=True, dpi=180):
-    kw = dict(facecolor=fig.get_facecolor())
-    if tight:
-        kw["bbox_inches"] = "tight"
-    fig.savefig(os.path.join(CH, base + ".png"), dpi=dpi, **kw)
-    fig.savefig(os.path.join(CH, base + ".svg"), **kw)
+def save(fig, base, dpi=180):
+    """Salva em PNG+SVG num canvas 16:9 FIXO (sem bbox_inches='tight', que corta textos)."""
+    fig.set_size_inches(16, 9)
+    fig.savefig(os.path.join(CH, base + ".png"), dpi=dpi, facecolor=fig.get_facecolor())
+    fig.savefig(os.path.join(CH, base + ".svg"), facecolor=fig.get_facecolor())
+
+def validate_fig(fig, label, dpi=180, tol=3):
+    """Valida que NENHUM texto sai da área da imagem (canvas) nem do próprio cartão."""
+    fig.canvas.draw()
+    ren = fig.canvas.get_renderer()
+    w, h = fig.canvas.get_width_height()
+    bad = []
+    # 1) todos os textos vs canvas (ignora textos invisíveis e ticks de eixos desligados)
+    for t in fig.texts + [tt for ax in fig.axes if ax.axison for tt in
+                          list(ax.texts) + ax.get_xticklabels() + ax.get_yticklabels()]:
+        if not t.get_visible():
+            continue
+        tb = t.get_window_extent(renderer=ren).extents
+        if (tb[0] < -tol or tb[1] < -tol or tb[2] > w + tol or tb[3] > h + tol):
+            bad.append(("canvas", t.get_text()[:40], tuple(int(v) for v in tb)))
+    # 2) textos dentro de cartões (axes com axis off)
+    for ax in fig.axes:
+        if ax.axison:
+            continue
+        box = ax.get_window_extent(renderer=ren).extents
+        for t in ax.texts:
+            if not t.get_visible():
+                continue
+            tb = t.get_window_extent(renderer=ren).extents
+            if (tb[0] < box[0] - 1 or tb[1] < box[1] - 1 or
+                    tb[2] > box[2] + 1 or tb[3] > box[3] + 1):
+                bad.append(("cartão", t.get_text()[:40], tuple(int(v) for v in tb)))
+    if bad:
+        print(f"[{label}] ALERTA: {len(bad)} texto(s) ultrapassam limites:")
+        for b in bad:
+            print("   ", b)
+    else:
+        print(f"[{label}] OK: nenhum texto cortado (canvas {w}x{h} @ {dpi}dpi).")
+    return bad
 
 def clean_ax(ax, xlabel=None, ylabel=None):
     ax.spines["top"].set_visible(False)
@@ -123,21 +156,26 @@ def bar_color(row, cen):
 d = dec.sort_values("n_airbnb(preço)").copy()
 y = np.arange(len(d))
 fig, ax = plt.subplots(figsize=(16, 9))
+fig.subplots_adjust(left=0.20, right=0.985, top=0.90, bottom=0.12)
 h = 0.36
 for i, (_, r) in enumerate(d.iterrows()):
     c_air = GRAY if r["lo_conf"] else NAVY
     c_viv = GRAY if r["lo_conf"] else SEA
     ax.barh(y[i] + h/2, r["n_airbnb(preço)"], height=h, color=c_air, label="Airbnb com preço" if i == 0 else None)
     ax.barh(y[i] - h/2, r["n_vivareal"], height=h, color=c_viv, label="VivaReal (anúncios)" if i == 0 else None)
-    ax.text(r["n_airbnb(preço)"], y[i] + h/2, f" {int(r['n_airbnb(preço)'])}", va="center", fontsize=10)
-    ax.text(r["n_vivareal"], y[i] - h/2, f" {int(r['n_vivareal'])}", va="center", fontsize=10)
+    ax.text(r["n_airbnb(preço)"], y[i] + h/2, f" {int(r['n_airbnb(preço)'])}", va="center",
+            fontsize=10, clip_on=False)
+    ax.text(r["n_vivareal"], y[i] - h/2, f" {int(r['n_vivareal'])}", va="center",
+            fontsize=10, clip_on=False)
 ax.set_yticks(y, d["nome"].tolist())
 ax.set_xlabel("Nº de imóveis / anúncios")
 ax.set_title("Mais dados em Meia Praia e Centro; os bairros de maior retorno têm amostra menor",
              fontsize=14, fontweight="bold", color=NAVY, loc="left", pad=14)
 ax.legend(loc="lower right", frameon=False)
-ax.margins(x=0.18)
+ax.margins(x=0.22)
 ax.set_axisbelow(True)
+ax.set_xlim(0, 2000)
+validate_fig(fig, "1_cobertura_amostras")
 save(fig, "1_cobertura_amostras")
 plt.close(fig)
 
@@ -145,6 +183,7 @@ plt.close(fig)
 # Figura 2 — Preço de compra x diária típica (relação que define o retorno)
 # ---------------------------------------------------------------------------
 fig, ax = plt.subplots(figsize=(16, 9))
+fig.subplots_adjust(left=0.16, right=0.955, top=0.90, bottom=0.11)
 markers = {"principal": "P", "alternativa": "A", "compacto": "C"}
 rows = []
 for _, r in dec.iterrows():
@@ -153,13 +192,16 @@ for _, r in dec.iterrows():
     ax.scatter(r["preco_compra_est"], r["diaria_tipica"], s=s, color=c,
                edgecolor=WHITE, linewidth=1.5, zorder=3)
     rows.append((r, c))
+# anota apenas os candidatos focais (menos poluição e sem textos na borda)
 for i, (r, c) in enumerate(rows):
+    if pd.isna(r["focal"]):
+        continue
     dx = 8 if i % 2 == 0 else -8
-    dy = 8 if i % 3 == 0 else -10
+    dy = 10 if i % 3 == 0 else -12
     ax.annotate(f"{r['nome_n']}\n{r['preco_compra_est']/1e3:.0f}.000 · {r['diaria_tipica']:.0f} · ret {r['retorno_base(%)']:.1f}%",
                 (r["preco_compra_est"], r["diaria_tipica"]),
                 xytext=(dx, dy), textcoords="offset points", fontsize=9, color=INK,
-                arrowprops=dict(arrowstyle="-", color="#C9D2E0", lw=0.8) if r["lo_conf"] else None)
+                clip_on=False)
 # legenda manual (sem sobrepor dados)
 from matplotlib.lines import Line2D
 leg = [
@@ -175,6 +217,11 @@ ax.set_ylabel("Diária típica (R$) — mediana Airbnb")
 ax.set_title("Diária e preço sobem juntos; o retorno vem da relação entre eles",
              fontsize=14, fontweight="bold", color=NAVY, loc="left", pad=14)
 clean_ax(ax)
+ax.xaxis.set_major_formatter(FuncFormatter(fmt_real))
+ax.set_xticks([0, 1_000_000, 2_000_000, 3_000_000, 4_000_000])
+ax.set_xlim(0, 4_000_000)
+ax.set_ylim(0, dec["diaria_tipica"].max() * 1.30)
+validate_fig(fig, "2_preco_x_diaria")
 save(fig, "2_preco_x_diaria")
 plt.close(fig)
 
@@ -184,6 +231,7 @@ plt.close(fig)
 d = dec.sort_values("retorno_base(%)", ascending=False).copy()
 y = np.arange(len(d))
 fig, ax = plt.subplots(figsize=(16, 9))
+fig.subplots_adjust(left=0.24, right=0.985, top=0.90, bottom=0.12)
 w = 0.55
 for i, (_, r) in enumerate(d.iterrows()):
     vals = [r["retorno_cons(%)"], r["retorno_base(%)"], r["retorno_otim(%)"]]
@@ -192,10 +240,10 @@ for i, (_, r) in enumerate(d.iterrows()):
         c = GRAY if r["lo_conf"] else (GOLD if (r["focal"] and cen == "base") else bar_c[cen])
         ax.barh(y[i] + o, v, height=w*0.8, left=0, color=c, edgecolor="none")
         ax.text(v, y[i] + o, f" {v:.1f}%", va="center", ha="left", fontsize=8.5,
-                color=GRAY_D if r["lo_conf"] else INK)
+                color=GRAY_D if r["lo_conf"] else INK, clip_on=False)
     if r["focal"]:
         ax.plot([-0.1, -0.1], [y[i] - 0.3, y[i] + 0.3], color=GOLD, lw=2.5)
-ax.set_yticks(y, d["nome_n"].tolist())
+ax.set_yticks(y, d["nome_n"].tolist(), fontsize=9.5)
 ax.set_xlabel("Retorno bruto estimado (% ao ano)  ·  receita estimada ÷ preço de compra estimado")
 ax.set_title("Morretes lidera o retorno, mas com amostra fina; Centro e Meia Praia são os mais testados",
              fontsize=14, fontweight="bold", color=NAVY, loc="left", pad=14)
@@ -204,35 +252,70 @@ lg = [Line2D([0], [0], color=NAVY_H, lw=6, label="Conservador"),
       Line2D([0], [0], color=SEA, lw=6, label="Otimista"),
       Line2D([0], [0], color=GRAY, lw=6, label="Baixa confiança (n<30)")]
 ax.legend(handles=lg, loc="lower right", frameon=False, fontsize=10)
-ax.margins(x=0.28)
 ax.set_axisbelow(True)
+ax.set_xticks([0, 2, 4, 6, 8, 10, 12, 14])
+ax.set_xlim(0, 14)
+validate_fig(fig, "3_retorno_3_cenarios")
 save(fig, "3_retorno_3_cenarios")
 plt.close(fig)
 
 # ---------------------------------------------------------------------------
-# PAINEL EXECUTIVO — 1 página (16:9)
+# Helpers de layout: medição de texto, quebra automática e validação de limites
 # ---------------------------------------------------------------------------
-fig = plt.figure(figsize=(16, 9))
-fig.patch.set_facecolor(BG)
-# layout em coordenadas normalizadas
-CX1, CX2, CX3 = 0.035, 0.3575, 0.68
-CW = 0.285
-card_w, card_h = CW, 0.215
-TXT_BOX = {"facecolor": WHITE, "edgecolor": "#DDE3EC", "linewidth": 1}
+from matplotlib.textpath import TextPath
+from matplotlib.font_manager import FontProperties as _FP
 
-def card(ax, accent, title, value, sub, n_lbl):
-    ax.add_patch(FancyBboxPatch((0.02, 0.04), 0.96, 0.92,
-                 boxstyle="round,pad=0.012,rounding_size=0.03",
-                 fc=WHITE, ec="#DDE3EC", lw=1.2))
-    ax.add_patch(FancyBboxPatch((0.02, 0.04), 0.92, 0.92,
-                 boxstyle="round,pad=0.012,rounding_size=0.03",
-                 fc="none", ec="none"))
-    ax.plot([0.05, 0.05], [0.10, 0.90], color=accent, lw=5, transform=ax.transAxes)
-    ax.text(0.10, 0.88, title, transform=ax.transAxes, fontsize=13, fontweight="bold", color=accent)
-    ax.text(0.10, 0.66, value, transform=ax.transAxes, fontsize=26, fontweight="bold", color=NAVY)
-    ax.text(0.10, 0.50, sub, transform=ax.transAxes, fontsize=11, color=MUTE)
-    ax.text(0.10, 0.34, n_lbl, transform=ax.transAxes, fontsize=10.5, color=MUTE)
-    ax.axis("off")
+def _txt_w(text, fontsize, family="DejaVu Sans"):
+    """Largura do texto em polegadas, usando a métrica real da fonte."""
+    fp = _FP(family=family, size=fontsize)
+    path = TextPath((0, 0), text, size=fontsize, prop=fp)
+    return path.get_extents().width / 72.0
+
+def wrap_inches(text, max_w_in, fontsize, family="DejaVu Sans"):
+    """Quebra em linhas para caber em max_w_in, sem cortar palavras."""
+    words, lines, cur = text.split(), [], ""
+    for w in words:
+        trial = (cur + " " + w).strip() if cur else w
+        if _txt_w(trial, fontsize, family) <= max_w_in or not cur:
+            cur = trial
+        else:
+            lines.append(cur)
+            cur = w
+    if cur:
+        lines.append(cur)
+    return lines
+
+def line_h_in(fontsize, spacing=1.16):
+    return fontsize / 72.0 * spacing
+
+def ax_inches(ax, fig):
+    pos = ax.get_position()
+    fw, fh = fig.get_size_inches()
+    return pos.width * fw, pos.height * fh
+
+def fit_block(ax, fig, x_frac, y_top_frac, text, max_w_frac, fontsize0, max_h_frac,
+              color=INK, ha="left", weight="normal", style="normal", spacing=1.16,
+              min_fs=6.0):
+    """Place text wrapped to width AND height, shrinking font until it fits."""
+    axw, axh = ax_inches(ax, fig)
+    max_w_in, max_h_in = max_w_frac * axw, max_h_frac * axh
+    fs = fontsize0
+    while fs >= min_fs:
+        lines = wrap_inches(text, max_w_in, fs)
+        if len(lines) * line_h_in(fs, spacing) <= max_h_in:
+            return ax.text(x_frac, y_top_frac, "\n".join(lines),
+                           transform=ax.transAxes, va="top", ha=ha, fontsize=fs,
+                           color=color, fontweight=weight, style=style, linespacing=1.2)
+        fs -= 0.5
+    lines = wrap_inches(text, max_w_in, min_fs)
+    return ax.text(x_frac, y_top_frac, "\n".join(lines), transform=ax.transAxes,
+                   va="top", ha=ha, fontsize=min_fs, color=color,
+                   fontweight=weight, style=style)
+
+def rounded_box(ax, x, y, w, h, fc, ec="#DDE3EC", radius=0.02, lw=1.2):
+    ax.add_patch(FancyBboxPatch((x, y), w, h,
+                 boxstyle=f"round,pad=0.01,rounding_size={radius}",
+                 fc=fc, ec=ec, lw=lw))
 
 def get_focal(name):
     f = FOCAL[name]
@@ -240,101 +323,175 @@ def get_focal(name):
     return dec[m].iloc[0]
 
 p = get_focal("principal"); a = get_focal("alternativa"); c = get_focal("compacto")
+CAND = [("principal", p, GOLD, "CANDIDATO PRINCIPAL"),
+        ("alternativa", a, SEA, "ALTERNATIVA (MAIS LÍQUIDA)"),
+        ("compacto", c, NAVY, "COMPACTO NO CENTRO (TESE)")]
 
-# Cartões
-for ax, key, r, accent, ttl in [
-    (fig.add_axes([CX1, 0.755, CW, card_h]), "principal", p, GOLD, "CANDIDATO PRINCIPAL"),
-    (fig.add_axes([CX2, 0.755, CW, card_h]), "alternativa", a, SEA, "ALTERNATIVA (MAIS LÍQUIDA)"),
-    (fig.add_axes([CX3, 0.755, CW, card_h]), "compacto", c, NAVY, "COMPACTO NO CENTRO (TESE)"),
-]:
-    sub = f"{r['nome']}  ·  retorno base {r['retorno_base(%)']:.1f}% a.a."
-    card(ax, accent=accent, title=ttl,
-         value=f"{r['retorno_base(%)']:.1f}% a.a.",
-         sub=sub,
-         n_lbl=f"preço R$ {r['preco_compra_est']/1e3:,.0f}k  ·  n Airbnb {int(r['n_airbnb(preço)'])}  ·  n VivaReal {int(r['n_vivareal'])}")
+CAND_WHY = {
+    "principal": "Maior retorno base entre grupos com amostra razoável (7,9% a.a.). "
+                 "Mercado de venda profundo (1.037 anúncios).",
+    "alternativa": "Amostra ampla e líquida (187 Airbnb, 243 venda). Menor surpresa "
+                   "esperada; base para escalar a operação.",
+    "compacto": "Melhor retorno dentro do Centro (6,97%) e menor preço de entrada. "
+                "A tese dos compactos se sustenta no Centro, não na cidade.",
+}
+CAND_RISK = {
+    "principal": "Amostra Airbnb moderada (51); retorno depende de ocupação constante "
+                 "e dos cenários de aluguel.",
+    "alternativa": "Retorno menor (5,9%) e preço de entrada maior (R$ 1,08 mi).",
+    "compacto": "Poucos anúncios de venda no Centro (22) e concentração da oferta; "
+                "ocupação é suposição.",
+}
+FOOT_NOTE = ("Retornos e receitas são estimativas baseadas em cenários de ocupação "
+             "(conservador / base / otimista) — ver scripts/config.py. Não representam "
+             "ocupação comprovada do mercado de Itapema.")
 
-# Título do painel
-fig.text(0.035, 0.955, "Recomendação preliminar de investimento — Itapema/SC",
-         fontsize=17, fontweight="bold", color=NAVY)
-fig.text(0.035, 0.925, "Comparação entre o candidato principal, a alternativa e o compacto no Centro "
-         "(números preliminares — sujeitos à recomendação final)",
-         fontsize=11, color=MUTE)
+# ---------------------------------------------------------------------------
+# VISUAL 4 — Resumo da decisão (3 cartões) — 16:9
+# ---------------------------------------------------------------------------
+fig = plt.figure(figsize=(16, 9))
+fig.patch.set_facecolor(BG)
 
-# Comparação visual — 3 minipainéis (preço / retorno base / amostra)
-def mini(ax, rows, accent, n_major, xlabel, title, fmt):
-    rows = rows.copy()
-    yy = np.arange(len(rows))
-    for i, (_, r) in enumerate(rows.iterrows()):
-        ax.barh(yy[i], r[n_major], height=0.6, color=accent, edgecolor="none")
-        ax.text(r[n_major], yy[i], f"  {fmt(r[n_major])}", va="center", fontsize=11,
-                color=INK, fontweight="bold")
-    ax.set_yticks(yy, rows["nome"].tolist())
-    ax.invert_yaxis()
-    ax.set_xlabel(xlabel)
-    ax.set_title(title, fontsize=11.5, fontweight="bold", color=NAVY, loc="left")
-    clean_ax(ax)
-    ax.margins(x=0.25)
+fig.text(0.035, 0.955, "Resumo da decisão — candidatos de investimento em Itapema/SC",
+         fontsize=17, fontweight="bold", color=NAVY, va="top")
+fig.text(0.035, 0.918, "Números preliminares, sujeitos à revisão. Percentuais = retorno bruto "
+         "estimado (% ao ano), receita estimada ÷ preço de compra estimado.",
+         fontsize=11, color=MUTE, va="top")
 
-comp_rows = pd.concat([p.to_frame().T, a.to_frame().T, c.to_frame().T])
-fmt_real1 = lambda v: fmt_real(v, None)
-mini(fig.add_axes([0.035, 0.495, 0.285, 0.21]), comp_rows, GOLD,
-     "preco_compra_est", "Preço compra estimado (R$)", "Preço de compra", fmt_real1)
-mini(fig.add_axes([0.3575, 0.495, 0.285, 0.21]), comp_rows, SEA,
-     "retorno_base(%)", "Retorno base (% a.a.)", "Retorno base", lambda v: f"{v:.1f}%")
-mini(fig.add_axes([0.68, 0.495, 0.285, 0.21]), comp_rows, NAVY,
-     "n_airbnb(preço)", "Amostra (n Airbnb com preço)", "Amostra", lambda v: f"{int(v)}")
+CXS = [0.03, 0.356, 0.682]
+CWS = 0.288
+CARD_Y0, CARD_H = 0.045, 0.85
 
-# Por que considerar / principal risco
-def text_block(ax, r, accent, why, risk):
-    ax.add_patch(FancyBboxPatch((0.02, 0.03), 0.96, 0.97,
-                 boxstyle="round,pad=0.012,rounding_size=0.02",
-                 fc=LIGHT, ec="#DDE3EC", lw=1))
-    ax.plot([0.055, 0.055], [0.12, 0.90], color=accent, lw=4, transform=ax.transAxes)
-    ax.text(0.10, 0.90, "POR QUE CONSIDERAR", transform=ax.transAxes, fontsize=10,
-            fontweight="bold", color=NAVY)
-    ax.text(0.10, 0.72, why, transform=ax.transAxes, fontsize=11, color=INK, va="top",
-            wrap=True)
-    ax.text(0.10, 0.42, "PRINCIPAL RISCO", transform=ax.transAxes, fontsize=10,
-            fontweight="bold", color=NAVY)
-    ax.text(0.10, 0.16, risk, transform=ax.transAxes, fontsize=10.5, color=MUTE, va="top",
-            wrap=True)
+for (key, r, accent, ttl), x in zip(CAND, CXS):
+    ax = fig.add_axes([x, CARD_Y0, CWS, CARD_H])
+    rounded_box(ax, 0.02, 0.02, 0.96, 0.95, WHITE, radius=0.022)
+    ax.plot([0.05, 0.05], [0.08, 0.92], color=accent, lw=5, transform=ax.transAxes)
+    # Título do cartão
+    ax.text(0.105, 0.945, ttl, transform=ax.transAxes, fontsize=13, fontweight="bold",
+            color=accent, va="top", ha="left")
+    # Nome do imóvel
+    ax.text(0.105, 0.86, r["nome"], transform=ax.transAxes, fontsize=21, fontweight="bold",
+            color=NAVY, va="top", ha="left")
+    # Valor principal
+    ax.text(0.105, 0.72, f"{r['retorno_base(%)']:.1f}% a.a.", transform=ax.transAxes,
+            fontsize=34, fontweight="bold", color=NAVY, va="top", ha="left")
+    # Linhas de informação (preço / amostras)
+    info = [
+        f"Preço estimado: R$ {r['preco_compra_est']/1e3:,.0f} mil",
+        f"Amostra Airbnb (com preço): {int(r['n_airbnb(preço)'])} imóveis",
+        f"Amostra VivaReal: {int(r['n_vivareal'])} anúncios",
+    ]
+    iy = 0.60
+    for line in info:
+        ax.text(0.105, iy, line, transform=ax.transAxes, fontsize=12.5, color=MUTE,
+                va="top", ha="left")
+        iy -= 0.052
+    # divisor
+    ax.plot([0.08, 0.94], [0.445, 0.445], transform=ax.transAxes, color="#E4E9F1", lw=1.2)
+    # Por que considerar
+    ax.text(0.105, 0.415, "POR QUE CONSIDERAR", transform=ax.transAxes, fontsize=11,
+            fontweight="bold", color=NAVY, va="top", ha="left")
+    fit_block(ax, fig, 0.105, 0.330, CAND_WHY[key], 0.80, 13.0, 0.155, color=INK)
+    # Principal risco
+    ax.text(0.105, 0.222, "PRINCIPAL RISCO", transform=ax.transAxes, fontsize=11,
+            fontweight="bold", color=NAVY, va="top", ha="left")
+    fit_block(ax, fig, 0.105, 0.148, CAND_RISK[key], 0.80, 12.5, 0.105, color=MUTE)
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
     ax.axis("off")
 
-tb = [
-    ("principal", p, GOLD,
-     "Maior retorno base entre grupos com amostra razoável (7,9% a.a.). " \
-     "Preço de entrada médio e mercado de venda profundo (1.037 anúncios).",
-     "Amostra Airbnb moderada (51 imóveis); retorno depende dos cenários de ocupação " \
-     "e de aluguel constante em Morretes."),
-    ("alternativa", a, SEA,
-     "Amostra mais ampla e líquida (187 Airbnb, 243 venda). Menor surpresa esperada; " \
-     "base para escalar operação em Meia Praia.",
-     "Retorno mais baixo (5,9% a.a.) e preço de compra maior (R$ 1,08 mi) — menos " \
-     "alavancagem por real investido."),
-    ("compacto", c, NAVY,
-     "Melhor retorno dentro do Centro (6,97% a.a.) e menor preço de entrada (R$ 890 mil). " \
-     "A tese dos compactos se sustenta no Centro, não na cidade.",
-     "Poucos anúncios de venda no Centro (22) e concentração da oferta — amostra " \
-     "de compra fina; ocupação é suposição."),
-]
-for key, r, accent, why, risk in tb:
-    x = {"principal": 0.035, "alternativa": 0.3575, "compacto": 0.68}[key]
-    text_block(fig.add_axes([x, 0.06, CW, 0.40]), r, accent, why, risk)
-
-# Nota de estimativa (rodapé)
-note_ax = fig.add_axes([0.035, 0.028, 0.93, 0.035], frameon=False)
-note_ax.add_patch(FancyBboxPatch((0.0, 0.0), 1.0, 1.0,
-                 boxstyle="round,pad=0.02,rounding_size=0.03",
-                 fc="#FBF3E0", ec="#E6CF80", lw=1))
-note_ax.text(0.5, 0.5,
-             "Nota de estimativa · retorno e receita são ESTIMATIVAS baseadas em cenários "
-             "de ocupação (conservador / base / otimista), ver scripts/config.py — não "
-             "representam ocupação comprovada do mercado de Itapema.",
-             transform=note_ax.transAxes, ha="center", va="center",
-             fontsize=10.5, color="#8A6D1F", style="italic", fontweight="bold")
+note_ax = fig.add_axes([0.02, 0.006, 0.96, 0.036], frameon=False)
+rounded_box(note_ax, 0.0, 0.0, 1.0, 1.0, "#FBF3E0", ec="#E6CF80", radius=0.05, lw=1)
+note_ax.text(0.5, 0.5, FOOT_NOTE, transform=note_ax.transAxes, ha="center", va="center",
+             fontsize=9.5, color="#8A6D1F", style="italic", fontweight="bold")
 note_ax.axis("off")
 
-save(fig, "0_dashboard_executivo", tight=False)
+validate_fig(fig, "4_resumo_decisao", dpi=200)
+save(fig, "4_resumo_decisao", dpi=200)
+plt.close(fig)
+
+# ---------------------------------------------------------------------------
+# VISUAL 5 — Comparação dos candidatos (3 gráficos simples) — 16:9
+# ---------------------------------------------------------------------------
+fig = plt.figure(figsize=(16, 9))
+fig.patch.set_facecolor(BG)
+
+fig.text(0.05, 0.955, "Comparação dos candidatos — Itapema/SC",
+         fontsize=17, fontweight="bold", color=NAVY, va="top")
+fig.text(0.05, 0.907, "Preço de compra estimado (mediana VivaReal) · retorno base (cenário "
+         "médio) · tamanho das amostras.",
+         fontsize=11, color=MUTE, va="top")
+
+colors = {"principal": GOLD, "alternativa": SEA, "compacto": NAVY}
+comp_rows = pd.concat([p.to_frame().T, a.to_frame().T, c.to_frame().T])
+comp_rows = comp_rows.reset_index(drop=True)
+
+PANELS = [
+    # (x, n_major, title, xlabel, fmt)
+    (0.05,  "preco_compra_est", "Preço de compra estimado", "R$ (mediana VivaReal)", lambda v: fmt_real(v, None)),
+    (0.365, "retorno_base(%)", "Retorno base", "% ao ano", lambda v: f"{v:.2f}%".replace(".", ",")),
+    (0.68,  "n_airbnb(preço)", "Tamanho da amostra (Airbnb)", "n imóveis com preço", lambda v: f"{int(v)}"),
+]
+
+def panel(ax, n_major, title, xlabel, fmt, show_viva=False):
+    yy = np.arange(len(comp_rows))[::-1]
+    for i, (_, r) in enumerate(comp_rows.iterrows()):
+        y = yy[i]
+        color = colors[r["focal"]]
+        ax.barh(y, r[n_major], height=0.5, color=color, edgecolor="none", zorder=3)
+        ax.text(r[n_major], y, f"  {fmt(r[n_major])}", va="center", ha="left",
+                fontsize=14, fontweight="bold", color=INK, zorder=4, clip_on=False)
+        # nome do candidato ACIMA da barra (horizontal, dentro do painel, sem corte)
+        ax.text(0.0, y + 0.42, r["nome"], va="bottom", ha="left",
+                fontsize=11, fontweight="bold", color=MUTE, zorder=4, clip_on=False)
+    # sem rótulos no eixo y (nomes vão acima das barras, evitando corte à esquerda)
+    ax.set_yticks([])
+    ax.set_xlabel(xlabel, fontsize=11, color=MUTE)
+    ax.set_title(title, fontsize=14, fontweight="bold", color=NAVY, loc="left", pad=14)
+    ax.set_axisbelow(True)
+    clean_ax(ax)
+    ax.set_xlim(0, comp_rows[n_major].max() * 1.42)
+    ax.tick_params(axis="x", colors=MUTE)
+    ax.set_yticks([])
+
+# painéis de preço e retorno
+for x, n_major, title, xlabel, fmt in PANELS[:2]:
+    panel(fig.add_axes([x, 0.16, 0.30, 0.70]), n_major, title, xlabel, fmt, show_viva=False)
+
+# painel de amostras: também mostra VivaReal
+axs = fig.add_axes([0.68, 0.16, 0.30, 0.70])
+yy = np.arange(len(comp_rows))[::-1]
+for i, (_, r) in enumerate(comp_rows.iterrows()):
+    y = yy[i]
+    axs.barh(y + 0.185, r["n_vivareal"], height=0.30, color="#C6CFDB", edgecolor="none",
+             label="VivaReal" if i == 0 else None, zorder=2)
+    axs.barh(y - 0.185, r["n_airbnb(preço)"], height=0.30, color=colors[r["focal"]],
+             edgecolor="none", label="Airbnb com preço" if i == 0 else None, zorder=3)
+    axs.text(r["n_vivareal"], y + 0.185, f"  {int(r['n_vivareal'])}", va="center", ha="left",
+             fontsize=12.5, color=MUTE, zorder=4, clip_on=False)
+    axs.text(r["n_airbnb(preço)"], y - 0.185, f"  {int(r['n_airbnb(preço)'])}", va="center",
+             ha="left", fontsize=12.5, fontweight="bold", color=INK, zorder=4, clip_on=False)
+    axs.text(0.0, y + 0.42, r["nome"], va="bottom", ha="left",
+             fontsize=11, fontweight="bold", color=MUTE, zorder=4, clip_on=False)
+axs.set_yticks([])
+axs.set_ylabel("Airbnb (verde/azul/dourado = candidato) · VivaReal (cinza)", fontsize=10, color=MUTE)
+axs.set_xlabel("n imóveis / anúncios", fontsize=11, color=MUTE)
+axs.set_title("Tamanho da amostra", fontsize=14, fontweight="bold", color=NAVY, loc="left", pad=14)
+axs.set_axisbelow(True)
+axs.set_xticks([0, 200, 400, 600, 800, 1000, 1200])
+axs.set_xlim(0, 1200)
+axs.legend(loc="lower right", frameon=False, fontsize=10)
+clean_ax(axs)
+axs.tick_params(axis="x", colors=MUTE)
+
+note_ax2 = fig.add_axes([0.02, 0.006, 0.96, 0.036], frameon=False)
+rounded_box(note_ax2, 0.0, 0.0, 1.0, 1.0, "#FBF3E0", ec="#E6CF80", radius=0.05, lw=1)
+note_ax2.text(0.5, 0.5, FOOT_NOTE, transform=note_ax2.transAxes, ha="center", va="center",
+              fontsize=9.5, color="#8A6D1F", style="italic", fontweight="bold")
+note_ax2.axis("off")
+
+validate_fig(fig, "5_comparacao_candidatos", dpi=200)
+save(fig, "5_comparacao_candidatos", dpi=200)
 plt.close(fig)
 
 print("Visuais regenerados (PNG + SVG) em output/charts/:")
