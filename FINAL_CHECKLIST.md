@@ -36,9 +36,13 @@ O formulário de entrega aceita um único envio.
 
 ## 4. ai-log/
 
-- [ ] Pasta `ai-log/` com conversas com a IA em **texto** (.md/.txt/.json)
-- [ ] Sessão **inteira** exportada (não apenas um trecho)
-- [ ] **Sem prints** como substituto — precisa ser texto legível
+- [x] Pasta `ai-log/` com conversas com a IA em **texto**
+- [x] `ai-log/opencode-session.json` — exportação oficial (`opencode export <id> --sanitize`)
+- [x] `ai-log/opencode-session.md` — versão legível em ordem cronológica (mensagens, respostas, ferramentas)
+- [x] `ai-log/README.md` — explica o JSON (oficial) e o Markdown (leitura)
+- [x] Sessão **inteira** exportada (346 mensagens)
+- [x] **Sem prints** como substituto — conteúdo em texto
+- [ ] *(pendente)* registrar exportação no formulário / confirmar que a sessão reflete todas as etapas
 
 ## 5. Vídeo (até 3 minutos)
 

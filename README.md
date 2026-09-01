@@ -187,7 +187,7 @@ python3 scripts/05_charts.py     # visuais -> output/charts/*.png e *.svg
 | `output/*.md` / `.csv` | Relatórios e tabela de decisão |
 | `output/charts/` | Visuais em PNG+SVG |
 | `output/processed/` | Dados limpos (reproduzíveis, não versionados) |
-| `ai-log/` | **Conversas com a IA em texto (sessão inteira) — será incluído antes do envio** |
+| `ai-log/` | **Conversas com a IA em texto (sessão inteira) — já incluído** ([JSON](ai-log/opencode-session.json) · [Markdown](ai-log/opencode-session.md)) |
 | `VIDEO_SCRIPT.md` | Roteiro do vídeo (~2min40) |
 | `FINAL_CHECKLIST.md` | Itens obrigatórios da entrega |
 | `data/` | Dados brutos do desafio |
@@ -200,9 +200,11 @@ python3 scripts/05_charts.py     # visuais -> output/charts/*.png e *.svg
 - `5_comparacao_candidatos` — comparação de preço, retorno e amostra.
 - `6_caracteristicas` — características associadas a diária/receita (correlação).
 
-**Como a IA foi utilizada:** as conversas completas estarão em `ai-log/` (texto) — iteração de
-análise, decisões de metodologia, revisões críticas das escolhas e correções de qualidade dos
-dados, documentados para avaliação do processo.
+**Como a IA foi utilizada:** as conversas completas estão em `ai-log/` (texto) —
+[exportação oficial (JSON)](ai-log/opencode-session.json) e
+[versão para leitura (Markdown)](ai-log/opencode-session.md) — com a iteração de análise,
+decisões de metodologia, revisões críticas das escolhas e correções de qualidade dos dados,
+documentadas para avaliação do processo.
 
 ## 10. Decisões tomadas com apoio da IA
 
