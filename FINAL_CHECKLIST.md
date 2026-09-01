@@ -40,7 +40,7 @@ O formulário de entrega aceita um único envio.
 - [x] `ai-log/opencode-session.json` — exportação oficial (`opencode export <id> --sanitize`)
 - [x] `ai-log/opencode-session.md` — versão legível em ordem cronológica (mensagens, respostas, ferramentas)
 - [x] `ai-log/README.md` — explica o JSON (oficial) e o Markdown (leitura)
-- [x] Sessão **inteira** exportada (346 mensagens)
+- [x] Sessão **inteira** exportada (**372 mensagens**, sessão `ses_fa58bf616ffe5GBlTj2Sr4CQBm`)
 - [x] **Sem prints** como substituto — conteúdo em texto
 - [ ] *(pendente)* registrar exportação no formulário / confirmar que a sessão reflete todas as etapas
 

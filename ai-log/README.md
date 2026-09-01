@@ -3,6 +3,9 @@
 Este diretório contém o registro completo das conversas entre o usuário e a IA (OpenCode)
 durante o desenvolvimento desta análise.
 
+**Sessão:** `ses_fa58bf616ffe5GBlTj2Sr4CQBm` — **372 mensagens**
+**Exportação (última):** 2026-09-01 (~04:45 Brasil / 04:49 UTC)
+
 | Arquivo | O que é |
 |---|---|
 | `opencode-session.json` | **Exportação oficial da sessão**, feita com `opencode export <id> --sanitize` (proteção de dados sensíveis). É a fonte canônica do processo. |
