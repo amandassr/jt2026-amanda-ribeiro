@@ -199,8 +199,15 @@ a receita anual será estimada por cenários, cada um com premissas explícitas 
 - **Base:** ocupação de referência + sazonalidade mensal média (mais defensável).
 - **Otimista:** ocupação alta + sazonalidade suave.
 
-Premissas (ocupação % por mês × fator fora da janela) serão declaradas em tabela, de forma explícita
-e separadas do que é **comprovado**. Mostraremos **como o resultado muda entre cenários**.
+**IMPORTANTE: as taxas de ocupação e os fatores de sazonalidade (mai–dez) são CENÁRIOS
+ILUSTRATIVOS escolhidos para TESTAR possibilidades e a sensibilidade da análise. Eles NÃO
+representam uma ocupação comprovada do mercado de Itapema** — a base não fornece noites reservadas.
+Qualquer conclusão que dependa desses números é suposição, não fato.
+
+As premissas (ocupação % por mês × fator fora da janela) ficam reunidas e centralizadas em
+`scripts/config.py`, num único lugar **fácil de alterar**. Todos os scripts de análise leem dali.
+Premissas são declaradas em tabela, de forma explícita e separadas do que é **comprovado**.
+Mostraremos **como o resultado muda entre cenários**.
 Nenhum número será tratado como "o valor certo" — a diária observada é um **potencial de preço**,
 não uma receita; receita só aparece multiplicada por premissas de ocupação deixadas claras.
 

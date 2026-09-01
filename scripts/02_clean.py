@@ -85,7 +85,7 @@ log("## T3. VivaReal — dedup de `listing_id` + bairro ausente marcado\n")
 log(f"- Linhas antes: {num(n_vv_before)} | depois: {num(n_vv_after)} "
     f"(removidas: {num(n_vv_before - n_vv_after)})")
 log(f"- `suburb` faltantes marcados como 'Desconhecido': 98\n")
-vv.to_csv(os.path.join(PROC, "vivareal_clean.csv"), index=False)
+# (vivareal_clean.csv é gravado ao final do T4, com o bairro já normalizado)
 
 # ===========================================================================
 # T4. Normalização de bairros (mapa explícito e registrado)
@@ -145,6 +145,8 @@ log("Distribuição dos bairros canônicos no Mesh:")
 table(mesh["suburb"].value_counts().rename_axis("suburb").reset_index(name="n"))
 log("Distribuição dos bairros canônicos no VivaReal:")
 table(vv["suburb"].value_counts().rename_axis("suburb").reset_index(name="n"))
+vv.drop(columns=["suburb_raw"]).to_csv(os.path.join(PROC, "vivareal_clean.csv"), index=False)
+log(f"\n- `vivareal_clean.csv` gravado com bairro normalizado ({len(vv)} linhas).\n")
 
 # Mesh 'none' -> Desconhecido (5)
 log(f"- `suburb` do Mesh marcados como 'Desconhecido' ('none'): "

@@ -38,18 +38,21 @@ Snapshot estático do mercado imobiliário de **Itapema (SC)**, com anúncios de
 | Pasta / arquivo | O que é |
 |---|---|
 | `BRIEF.md` | Planejamento da análise (objetivo, critérios, tratamento dos dados, limitações, etapas) |
-| `scripts/` | Código Python reproduzível (auditoria e limpeza) |
+| `scripts/` | Código Python reproduzível (auditoria, limpeza, receita, retorno e gráficos) |
+| `scripts/config.py` | **Premissas centrais dos cenários (ocupação e sazonalidade)** — um único lugar para alterar |
 | `output/audit_report.md` | Relatório de auditoria dos dados brutos (linhas, ausentes, duplicidades, chaves, períodos, cobertura) |
 | `output/clean_log.md` | Log de limpeza: cada tratamento aplicado e quantos registros mudaram |
+| `output/revenue_report.md` | Estimativa de receita potencial por imóvel e por grupo, nos 3 cenários |
+| `output/decision_table.csv` | Tabela de decisão: perfil × localização, compra, receita e retorno bruto nos 3 cenários |
 | `output/processed/` | Dados limpos gerados pelos scripts (reproduzíveis, não versionados) |
 | `data/` | Dados brutos fornecidos pelo desafio |
 
 ## Como executar
 
-Crie um ambiente com Python 3 e instale `pandas`:
+Crie um ambiente com Python 3 e instale as dependências:
 
 ```bash
-pip install pandas
+pip install pandas matplotlib
 ```
 
 Auditoria dos dados brutos:
@@ -62,6 +65,24 @@ Limpeza e organização (geram `output/clean_log.md` e os arquivos em `output/pr
 
 ```bash
 python3 scripts/02_clean.py
+```
+
+Estimativa de receita (lê `scripts/config.py` para cenários):
+
+```bash
+python3 scripts/03_revenue.py  # gera output/revenue_report.md
+```
+
+Retorno bruto e tabela de decisão:
+
+```bash
+python3 scripts/04_return.py   # gera output/decision_table.csv + output/return_report.md
+```
+
+Gráficos combinados:
+
+```bash
+python3 scripts/05_charts.py   # gera output/charts/*.png
 ```
 
 Os arquivos limpos podem ser recriados a qualquer momento; por isso não são versionados.
@@ -80,6 +101,8 @@ Os arquivos limpos podem ser recriados a qualquer momento; por isso não são ve
 - **Sem metragem no Airbnb** — não se usa receita por m²; não inventamos área.
 - **Ausência de preço NÃO significa ocupado/receita zero.**
 - **Diária anunciada ≠ receita** (sem ocupação real). A sazonalidade jan→abr ainda é um indício a validar.
+- **As premissas de ocupação e sazonalidade são cenários ilustrativos** (centralizadas em `scripts/config.py`),
+  não uma ocupação comprovada do mercado de Itapema.
 
 > Ainda **não** há ranking nem recomendação final: eles virão nas próximas etapas.
 

@@ -1,6 +1,6 @@
 # Log de Limpeza — Etapa 1
 **Gerado por:** `scripts/02_clean.py`
-**Data:** 2026-09-01 02:20
+**Data:** 2026-09-01 02:43
 
 ---
 
@@ -132,6 +132,12 @@ Distribuição dos bairros canônicos no VivaReal:
 15                  Itapema     2
 16              Sertaozinho     1
 17              Ocean Tower     1
+
+
+---
+
+
+- `vivareal_clean.csv` gravado com bairro normalizado (8293 linhas).
 
 
 ---
