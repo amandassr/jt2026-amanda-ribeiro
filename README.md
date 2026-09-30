@@ -1,10 +1,10 @@
-**[LINK DO VÍDEO — preencher antes do envio]** (Google Drive, "qualquer pessoa com o link", até 3 min): `[PREENCHER ANTES DO ENVIO]`
+Projeto desenvolvido por Amanda Ribeiro com Python, Pandas e apoio de IA generativa. A entrega reúne análise reproduzível, testes de robustez, visualizações e documentação transparente das decisões e limitações.
 
 ---
 
 # Hackathon Jovens Talentos AI Builder 2026 — Seazone
 
-# Recomendação de investimento imobiliário — Itapema (SC)
+## Recomendação de investimento imobiliário — Itapema (SC)
 
 ## 1. Resumo executivo
 
